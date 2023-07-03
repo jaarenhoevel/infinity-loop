@@ -60,15 +60,6 @@ class Shape {
     }
 }
 
-const shapes = {};
-
-shapes["end"]       = new Shape("end", [1, 0, 0, 0], 0)
-shapes["straight"]  = new Shape("straight", [1, 0, 1, 0], 0.4);
-shapes["curve"]     = new Shape("curve", [1, 1, 0, 0], 0.4);
-shapes["cross"]     = new Shape("cross", [1, 1, 1, 1], 0.25);
-shapes["branch"]    = new Shape("branch", [1, 1, 1, 0], 0.4);
-shapes["empty"]     = new Shape("empty", [0, 0, 0, 0], 0.4);
-
 class Grid {
     /**
      * 
@@ -258,10 +249,139 @@ class Grid {
     }
 }
 
-const grid = new Grid(12, 12, shapes);
-console.log(grid.fillAll());
-console.log(grid.mirror(0));
-//console.log(grid.mirror(1));
+class ShapeFactory {
+    constructor(shapeSize, lineWidth = 0.15, padding = 0.25) {
+        this.shapeSize = shapeSize;
+        this.lineWidth = lineWidth * shapeSize;
+        this.padding = padding * shapeSize;
+    }
+
+    setLineMode(ctx) {
+        ctx.lineWidth = this.lineWidth;
+        ctx.globalCompositeOperation = "source-over"; 
+    }
+
+    setPaddingMode(ctx) {
+        ctx.lineWidth = this.padding;
+        ctx.globalCompositeOperation = "destination-out";     
+    }
+
+    drawShape(ctx, shape, progress = [1, 1, 1, 1]) {
+        switch (shape.name) {
+            case "straight": {
+                this.setLineMode(ctx);
+
+                ctx.beginPath();
+                ctx.moveTo(this.shapeSize / 2, 0);
+                ctx.lineTo(this.shapeSize / 2, this.shapeSize * progress[0]);
+
+                ctx.moveTo(this.shapeSize / 2, this.shapeSize);
+                ctx.lineTo(this.shapeSize / 2, this.shapeSize - (this.shapeSize * progress[2]));
+
+                ctx.stroke();
+                break;
+            }
+            
+            case "curve": {
+                this.setLineMode(ctx);
+
+                ctx.beginPath();
+                ctx.arc(this.shapeSize, 0, this.shapeSize / 2, Math.PI - (progress[0] * 0.5 * Math.PI), Math.PI);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.arc(this.shapeSize, 0, this.shapeSize / 2, 0.5 * Math.PI, 0.5 * Math.PI + (progress[1] * 0.5 * Math.PI));
+                ctx.stroke();
+                break;
+            }
+            
+            case "end": {
+                this.setLineMode(ctx);
+
+                ctx.beginPath();
+                ctx.arc(this.shapeSize / 2, this.shapeSize / 2, this.shapeSize / 5, 0, 2 * Math.PI);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(this.shapeSize / 2, 0);
+                ctx.lineTo(this.shapeSize / 2, ((this.shapeSize / 2) - (this.shapeSize / 4)) * progress[0]);
+                ctx.stroke();
+                break;
+            }
+            
+            case "cross": {
+                
+                // TOP RIGHT (FIRST HALF)
+                this.setLineMode(ctx);
+                ctx.beginPath();
+                ctx.arc(0, 0, this.shapeSize / 2, 0, 0.25 * Math.PI);
+                ctx.stroke();
+
+                // BOTTOM RIGHT
+                this.setPaddingMode(ctx);
+                ctx.beginPath();
+                ctx.arc(this.shapeSize, 0, this.shapeSize / 2, 0.5 * Math.PI, Math.PI);
+                ctx.stroke();
+                
+                this.setLineMode(ctx);
+                ctx.beginPath();
+                ctx.arc(this.shapeSize, 0, this.shapeSize / 2, 0.5 * Math.PI, Math.PI);
+                ctx.stroke();
+
+                // BOTTOM LEFT
+                this.setPaddingMode(ctx);
+                ctx.beginPath();
+                ctx.arc(this.shapeSize, this.shapeSize, this.shapeSize / 2, Math.PI, 1.5 * Math.PI);
+                ctx.stroke();
+                
+                this.setLineMode(ctx);
+                ctx.beginPath();
+                ctx.arc(this.shapeSize, this.shapeSize, this.shapeSize / 2, Math.PI, 1.5 * Math.PI);
+                ctx.stroke();
+
+                // TOP LEFT
+                this.setPaddingMode(ctx);
+                ctx.beginPath();
+                ctx.arc(0, this.shapeSize, this.shapeSize / 2, 1.5 * Math.PI, 2 * Math.PI);
+                ctx.stroke();
+                
+                this.setLineMode(ctx);
+                ctx.beginPath();
+                ctx.arc(0, this.shapeSize, this.shapeSize / 2, 1.5 * Math.PI, 2 * Math.PI);
+                ctx.stroke();
+
+                // TOP RIGHT (SECOND HALF)
+                this.setPaddingMode(ctx);
+                ctx.beginPath();
+                ctx.arc(0, 0, this.shapeSize / 2, 0.25 * Math.PI, 0.5 * Math.PI);
+                ctx.stroke();
+                
+                this.setLineMode(ctx);
+                ctx.beginPath();
+                ctx.arc(0, 0, this.shapeSize / 2, 0.25 * Math.PI, 0.5 * Math.PI);
+                ctx.stroke();
+                
+                break;
+            }
+
+            case "branch": {
+                this.setLineMode(ctx);
+                ctx.beginPath();
+                ctx.arc(this.shapeSize, 0, this.shapeSize / 2, 0.5 * Math.PI, Math.PI);
+                ctx.stroke();
+
+                this.setPaddingMode(ctx);
+                ctx.beginPath();
+                ctx.arc(this.shapeSize, this.shapeSize, this.shapeSize / 2, Math.PI, 1.5 * Math.PI);
+                ctx.stroke();
+                this.setLineMode(ctx);
+                ctx.beginPath();
+                ctx.arc(this.shapeSize, this.shapeSize, this.shapeSize / 2, Math.PI, 1.5 * Math.PI);
+                ctx.stroke();
+            }
+        }    
+    }
+}
 
 class GridCanvas {
     constructor(canvas, grid) {
@@ -270,6 +390,9 @@ class GridCanvas {
         this.shapeSize = canvas.width / grid.x;
 
         this.context = canvas.getContext("2d");
+        this.shapeFactory = new ShapeFactory(this.shapeSize);
+
+        console.log(`Shape size: ${this.shapeSize}px.`);
 
         this.img = {};
         for (let shape in grid.shapes) {
@@ -294,9 +417,12 @@ class GridCanvas {
 
     drawShape(shape, rotation, x, y) {
         this.context.save();
-        this.context.translate((x * this.shapeSize) + this.shapeSize / 2, (y * this.shapeSize ) + this.shapeSize / 2)
+        this.context.translate((x * this.shapeSize) + this.shapeSize / 2, (y * this.shapeSize ) + this.shapeSize / 2);
         this.context.rotate(Math.PI / 2 * rotation);
-        this.context.drawImage(this.img[shape.name], - this.shapeSize / 2, - this.shapeSize / 2, this.shapeSize, this.shapeSize);
+        this.context.translate(this.shapeSize / 2 * -1, this.shapeSize / 2 * -1);
+        
+        this.shapeFactory.drawShape(this.context, shape);
+
         this.context.restore();
     }
 
@@ -309,6 +435,21 @@ class GridCanvas {
     }
 }
 
+const shapes = {};
+
+shapes["end"]       = new Shape("end", [1, 0, 0, 0], 0)
+shapes["straight"]  = new Shape("straight", [1, 0, 1, 0], 0.4);
+shapes["curve"]     = new Shape("curve", [1, 1, 0, 0], 0.4);
+shapes["cross"]     = new Shape("cross", [1, 1, 1, 1], 0.25);
+shapes["branch"]    = new Shape("branch", [1, 1, 1, 0], 0.4);
+shapes["empty"]     = new Shape("empty", [0, 0, 0, 0], 0.4);
+
+const grid = new Grid(10, 10, shapes);
+console.log(grid.fillAll());
+console.log(grid.mirror(0));
+console.log(grid.mirror(1));
+
 const gridCanvas = new GridCanvas(document.getElementById("grid-canvas"), grid);
 
+// gridCanvas.drawGridLines();
 gridCanvas.drawAllShapes();
