@@ -440,14 +440,14 @@ const shapes = {};
 shapes["end"]       = new Shape("end", [1, 0, 0, 0], 0)
 shapes["straight"]  = new Shape("straight", [1, 0, 1, 0], 0.4);
 shapes["curve"]     = new Shape("curve", [1, 1, 0, 0], 0.4);
-shapes["cross"]     = new Shape("cross", [1, 1, 1, 1], 0.25);
+shapes["cross"]     = new Shape("cross", [1, 1, 1, 1], 0.4);
 shapes["branch"]    = new Shape("branch", [1, 1, 1, 0], 0.4);
 shapes["empty"]     = new Shape("empty", [0, 0, 0, 0], 0.4);
 
-const grid = new Grid(10, 10, shapes);
+const grid = new Grid(16, 16, shapes);
 console.log(grid.fillAll());
 console.log(grid.mirror(0));
-console.log(grid.mirror(1));
+// console.log(grid.mirror(1));
 
 const gridCanvas = new GridCanvas(document.getElementById("grid-canvas"), grid);
 
