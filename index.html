@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+    <head>
+        <title>Infinity Loop?</title>
+
+        <style>
+            body {
+                background-color: rgb(37, 84, 128);
+            }
+            
+            #grid-canvas {
+                position: absolute;
+                top:0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin:auto;
+                opacity: .5;
+                mix-blend-mode: soft-light;
+            }
+        </style>
+        <script>
+            window.onload = window.onresize = function() {
+                var canvas = document.getElementById('canvas');
+                canvas.width = window.innerWidth * 0.8;
+                canvas.height = window.innerHeight * 0.8;
+            }
+        </script>
+    </head>
+    <body>
+        <canvas width="750" height="750" id="grid-canvas"></canvas>
+
+        <script src="scripts/test.js"></script>
+    </body>
+</html>
