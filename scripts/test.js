@@ -446,7 +446,7 @@ shapes["empty"]     = new Shape("empty", [0, 0, 0, 0], 0.4);
 
 const grid = new Grid(16, 16, shapes);
 console.log(grid.fillAll());
-console.log(grid.mirror(0));
+// console.log(grid.mirror(0));
 // console.log(grid.mirror(1));
 
 const gridCanvas = new GridCanvas(document.getElementById("grid-canvas"), grid);
