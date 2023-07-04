@@ -76,7 +76,7 @@ class Grid {
         for (let i = 0; i < x; i ++) {
             this.grid[i] = new Array(y);
             for (let j = 0; j < y; j ++) {
-                this.grid[i][j] = [null, 0];
+                this.grid[i][j] = [null, 0, [0, 0, 0, 0]];
             }
         }
     }
@@ -111,6 +111,31 @@ class Grid {
     getShapeRotation(x, y) {
         if (this.isOutOfBounds()) return -1; 
         return this.grid[x][y][1];  
+    }
+
+    /**
+     * Get shape progress at position
+     * @param {Number} x 
+     * @param {Number} y 
+     * @returns {Array} progress
+     */
+    getShapeProgress(x, y) {
+        if (this.isOutOfBounds()) return [-1, -1, -1, -1]; 
+        return this.grid[x][y][2];  
+    }
+
+    /**
+     * Set shape progress
+     * @param {Number} x 
+     * @param {Number} y 
+     * @param {Array} progress 
+     * @returns success
+     */
+    setShapeProgress(x, y, progress) {
+        if (this.isOutOfBounds()) return false;
+        this.grid[x][y][2] = progress;
+        
+        return true;
     }
 
     /**
@@ -247,6 +272,10 @@ class Grid {
         if (direction === 1) return [connections[2], connections[1], connections[0], connections[3]];
     }
 
+    /**
+     * Returns array of possible paths. Ensures every shape is part of one path
+     * @returns {Array} paths
+     */
     getPaths() {
         // Collect all possible starting points
         const startPoints = [];
@@ -264,6 +293,16 @@ class Grid {
                 if (traversed[index][0] === x && traversed[index][1] === y) return true;
             }
             return false;
+        }
+
+        const getNotTraversed = () => {
+            for (let i = 0; i < this.x; i ++) {
+                for (let j = 0; j < this.y; j ++) {
+                     if (!isTraversed(i, j)) return [i, j];
+                }
+            }
+            
+            return null;
         }
 
         class PathEntry {
@@ -302,6 +341,7 @@ class Grid {
 
         const paths = [];
 
+        // Traverse any end point
         startPoints.forEach(point => {
             if (isTraversed(...point)) return;
             
@@ -310,6 +350,15 @@ class Grid {
 
             paths.push(path);
         });
+
+
+        // Check if there are shapes not connected to any end point
+        for (let point; point = getNotTraversed(); point !== null) {
+            const path = new PathEntry(point);
+            traverse(path, point);
+
+            paths.push(path);
+        }
 
         return paths;
     }
@@ -326,6 +375,8 @@ class ShapeFactory {
         this.shapeSize = shapeSize;
         this.lineWidth = lineWidth * shapeSize;
         this.padding = padding * shapeSize;
+
+        console.log(`Line width: ${this.lineWidth}px.`);
     }
 
     /**
@@ -396,7 +447,8 @@ class ShapeFactory {
             }
             
             case "cross": {
-                
+                if (Math.max(...progress) === 0) break;
+
                 // TOP RIGHT (FIRST HALF)
                 this.setLineMode(ctx);
                 ctx.beginPath();
@@ -451,6 +503,8 @@ class ShapeFactory {
             }
 
             case "branch": {
+                if (Math.max(...progress) === 0) break;
+                
                 this.setLineMode(ctx);
                 ctx.beginPath();
                 ctx.arc(this.shapeSize, 0, this.shapeSize / 2, 0.5 * Math.PI, Math.PI);
@@ -464,6 +518,8 @@ class ShapeFactory {
                 ctx.beginPath();
                 ctx.arc(this.shapeSize, this.shapeSize, this.shapeSize / 2, Math.PI, 1.5 * Math.PI);
                 ctx.stroke();
+
+                break;
             }
         }    
     }
@@ -515,27 +571,55 @@ class GridCanvas {
      * @param {Number} rotation 0...4
      * @param {Number} x 
      * @param {Number} y 
+     * @param {Array} progress
      */
-    drawShape(shape, rotation, x, y) {
+    drawShape(shape, rotation, x, y, progress = [1, 1, 1, 1]) {
         this.context.save();
         this.context.translate((x * this.shapeSize) + this.shapeSize / 2, (y * this.shapeSize ) + this.shapeSize / 2);
         this.context.rotate(Math.PI / 2 * rotation);
         this.context.translate(this.shapeSize / 2 * -1, this.shapeSize / 2 * -1);
         
-        this.shapeFactory.drawShape(this.context, shape);
+        this.shapeFactory.drawShape(this.context, shape, progress);
 
         this.context.restore();
     }
 
     /**
      * Draws all shapes on canvas
+     * @param {boolean} clear clear canvas before drawing
      */
-    drawAllShapes() {
+    drawAllShapes(clear = true) {
+        if (clear) this.clearCanvas();
+        
         for (let i = 0; i < this.grid.x; i ++) {
             for (let j = 0; j < this.grid.y; j ++) {
-                this.drawShape(this.grid.getShape(i, j), this.grid.getShapeRotation(i, j), i, j);
+                this.drawShape(this.grid.getShape(i, j), this.grid.getShapeRotation(i, j), i, j, this.grid.getShapeProgress(i, j));
             }
         }
+    }
+
+    clearCanvas() {
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    startAnimation(stepTime = 20) {
+        const paths = this.grid.getPaths();  
+        // console.log(paths);
+
+        const animate = (pathElement) => {
+            // console.log(`Current path element: [${pathElement.point[0]}][${pathElement.point[1]}]`);
+
+            this.grid.setShapeProgress(...pathElement.point, [1, 1, 1, 1]) // set progress to finished
+            this.drawAllShapes();
+
+            pathElement.next.forEach(nextPathElement => {
+                setTimeout(() => {
+                    animate(nextPathElement);
+                }, stepTime);
+            })
+        }
+
+        paths.forEach(animate);
     }
 }
 
@@ -552,9 +636,9 @@ const grid = new Grid(12, 10, shapes);
 console.log(grid.fillAll());
 // console.log(grid.mirror(0));
 // console.log(grid.mirror(1));
-console.log(grid.getPaths());
 
 const gridCanvas = new GridCanvas(document.getElementById("grid-canvas"), grid);
 
 // gridCanvas.drawGridLines();
 gridCanvas.drawAllShapes();
+gridCanvas.startAnimation();
