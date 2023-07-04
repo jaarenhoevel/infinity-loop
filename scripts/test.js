@@ -246,6 +246,73 @@ class Grid {
         if (direction === 0) return [connections[0], connections[3], connections[2], connections[1]];
         if (direction === 1) return [connections[2], connections[1], connections[0], connections[3]];
     }
+
+    getPaths() {
+        // Collect all possible starting points
+        const startPoints = [];
+
+        for (let i = 0; i < this.x; i ++) {
+            for (let j = 0; j < this.y; j ++) {
+                if (this.grid[i][j][0].name === "end") startPoints.push([i, j]); 
+            }
+        }
+
+        const traversed = [];
+
+        function isTraversed(x, y) {
+            for (let index in traversed) {
+                if (traversed[index][0] === x && traversed[index][1] === y) return true;
+            }
+            return false;
+        }
+
+        class PathEntry {
+            constructor(point) {
+                this.point = point;
+                this.next = [];
+            }
+
+            addNext(next) {
+                this.next.push(next);
+            }
+        }
+
+        const traverse = (pathEntry, point) => {
+            traversed.push(point);
+            
+            const connections = this.getShape(...point).getRotatedConnections(this.getShapeRotation(...point));
+
+            const nextCandidates = [];
+
+            if (connections[0] === 1) nextCandidates.push([point[0], point[1] - 1]);
+            if (connections[1] === 1) nextCandidates.push([point[0] + 1, point[1]]);
+            if (connections[2] === 1) nextCandidates.push([point[0], point[1] + 1]);
+            if (connections[3] === 1) nextCandidates.push([point[0] - 1, point[1]]);
+
+            for (let index in nextCandidates) {
+                if (isTraversed(...nextCandidates[index])) continue;
+
+                const path = new PathEntry(nextCandidates[index]);
+                pathEntry.addNext(path);
+
+                traverse(path, nextCandidates[index]);
+            }
+
+        }
+
+        const paths = [];
+
+        startPoints.forEach(point => {
+            if (isTraversed(...point)) return;
+            
+            const path = new PathEntry(point);
+            traverse(path, point);
+
+            paths.push(path);
+        });
+
+        return paths;
+    }
 }
 
 class ShapeFactory {
@@ -481,10 +548,11 @@ shapes["cross"]     = new Shape("cross", [1, 1, 1, 1], 0.4);
 shapes["branch"]    = new Shape("branch", [1, 1, 1, 0], 0.4);
 shapes["empty"]     = new Shape("empty", [0, 0, 0, 0], 0.4);
 
-const grid = new Grid(16, 16, shapes);
+const grid = new Grid(12, 10, shapes);
 console.log(grid.fillAll());
 // console.log(grid.mirror(0));
 // console.log(grid.mirror(1));
+console.log(grid.getPaths());
 
 const gridCanvas = new GridCanvas(document.getElementById("grid-canvas"), grid);
 
