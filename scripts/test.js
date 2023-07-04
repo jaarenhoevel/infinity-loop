@@ -286,6 +286,8 @@ class Grid {
             }
         }
 
+        shuffle(startPoints);
+
         const traversed = [];
 
         function isTraversed(x, y) {
