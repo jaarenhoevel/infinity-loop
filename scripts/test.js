@@ -290,6 +290,12 @@ class Grid {
 
         const traversed = [];
 
+        /**
+         * Checks if a point is already traversed
+         * @param {Number} x 
+         * @param {Number} y 
+         * @returns traversed
+         */
         function isTraversed(x, y) {
             for (let index in traversed) {
                 if (traversed[index][0] === x && traversed[index][1] === y) return true;
@@ -297,6 +303,10 @@ class Grid {
             return false;
         }
 
+        /**
+         * Get not yet traversed elements
+         * @returns First non traversed shape or null when all traversed
+         */
         const getNotTraversed = () => {
             for (let i = 0; i < this.x; i ++) {
                 for (let j = 0; j < this.y; j ++) {
@@ -307,6 +317,9 @@ class Grid {
             return null;
         }
 
+        /**
+         * Describes path
+         */
         class PathEntry {
             constructor(point) {
                 this.point = point;
@@ -318,6 +331,11 @@ class Grid {
             }
         }
 
+        /**
+         * Recursive function traversing
+         * @param {PathEntry} pathEntry 
+         * @param {Array} point 
+         */
         const traverse = (pathEntry, point) => {
             traversed.push(point);
             
