@@ -65,8 +65,7 @@ class Grid {
      * 
      * @param {Number} x 
      * @param {Number} y 
-     * @param {Shape} shapes 
-     * @param {String} defaultShape 
+     * @param {Shape} shapes
      */
     constructor(x, y, shapes) {
         this.x = x;
@@ -209,7 +208,7 @@ class Grid {
 
     /**
      * Mirrors whole grid
-     * @param {Number} direction 
+     * @param {Number} direction 0: horizontal; 1: vertical
      * @returns successful
      */
     mirror(direction = 0) {
@@ -250,22 +249,42 @@ class Grid {
 }
 
 class ShapeFactory {
+    /**
+     * Draws shapes
+     * @param {Number} shapeSize size of shapes in px 
+     * @param {Number} lineWidth width of lines as percentage
+     * @param {Number} padding width of padding line as percentage
+     */
     constructor(shapeSize, lineWidth = 0.15, padding = 0.25) {
         this.shapeSize = shapeSize;
         this.lineWidth = lineWidth * shapeSize;
         this.padding = padding * shapeSize;
     }
 
+    /**
+     * Sets up context for normal line
+     * @param {context} ctx 
+     */
     setLineMode(ctx) {
         ctx.lineWidth = this.lineWidth;
         ctx.globalCompositeOperation = "source-over"; 
     }
 
+    /**
+     * Sets up context for padding line
+     * @param {context} ctx 
+     */
     setPaddingMode(ctx) {
         ctx.lineWidth = this.padding;
         ctx.globalCompositeOperation = "destination-out";     
     }
 
+    /**
+     * Draws shape at context
+     * @param {context} ctx 
+     * @param {Shape} shape shape to draw
+     * @param {Array} progress progress of animation; value for each side 0..1
+     */
     drawShape(ctx, shape, progress = [1, 1, 1, 1]) {
         switch (shape.name) {
             case "straight": {
@@ -384,6 +403,11 @@ class ShapeFactory {
 }
 
 class GridCanvas {
+    /**
+     * Draws gernerated grid on canvas
+     * @param {canvas} canvas 
+     * @param {Grid} grid 
+     */
     constructor(canvas, grid) {
         this.canvas = canvas;
         this.grid = grid;
@@ -401,6 +425,9 @@ class GridCanvas {
         }
     }
 
+    /**
+     * Draws a checkboard pattern
+     */
     drawGridLines() {
         for (var x = this.shapeSize; x < this.canvas.width; x += this.shapeSize) {
             this.context.moveTo(0.5 + x, 0);
@@ -415,6 +442,13 @@ class GridCanvas {
         this.context.stroke();    
     }
 
+    /**
+     * Draws a shape at specified location
+     * @param {Shape} shape 
+     * @param {Number} rotation 0...4
+     * @param {Number} x 
+     * @param {Number} y 
+     */
     drawShape(shape, rotation, x, y) {
         this.context.save();
         this.context.translate((x * this.shapeSize) + this.shapeSize / 2, (y * this.shapeSize ) + this.shapeSize / 2);
@@ -426,6 +460,9 @@ class GridCanvas {
         this.context.restore();
     }
 
+    /**
+     * Draws all shapes on canvas
+     */
     drawAllShapes() {
         for (let i = 0; i < this.grid.x; i ++) {
             for (let j = 0; j < this.grid.y; j ++) {
