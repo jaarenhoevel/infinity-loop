@@ -69,7 +69,7 @@ export class Grid {
                 continue;
             }
 
-            let shapeConnections = this.getShape(...shapePosition).getRotatedConnections(this.getShapeRotation(...shapePosition));
+            let shapeConnections = this.getShape(...shapePosition).getConnections();
 
             connections[i] = shapeConnections[(i + 2) % 4];
         }

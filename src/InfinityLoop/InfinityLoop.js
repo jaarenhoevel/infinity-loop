@@ -9,6 +9,7 @@ export class InfinityLoop {
     constructor(canvas, x, y, lineWidth, paddingLineWidth) {
         this.canvas = canvas;
         this.grid = new Grid(x, y);
+        this.grid.fillAll();
 
         this.context = canvas.getContext("2d");
 
@@ -52,7 +53,7 @@ export class InfinityLoop {
         this.context.rotate(Math.PI / 2 * shape.rotation);
         this.context.translate(this.drawSettings.shapeSize / 2 * -1, this.drawSettings.shapeSize / 2 * -1);
         
-        shape.draw();
+        shape.draw(this.context, this.drawSettings);
 
         this.context.restore();
     }
@@ -67,6 +68,7 @@ export class InfinityLoop {
         for (let i = 0; i < this.grid.x; i ++) {
             for (let j = 0; j < this.grid.y; j ++) {
                 this.drawShape(this.grid.getShape(i, j), i, j);
+                console.log(`Drawing ${this.grid.getShape(i, j).constructor.name} at ${i} ${j}`);
             }
         }
     }
