@@ -22,6 +22,13 @@
     <body>
         <canvas width="960" height="800" id="grid-canvas"></canvas>
 
-        <script src="scripts/test.js"></script>
+        <script type="module">
+            import { Straight } from "./src/InfinityLoop/modules/Shapes.js";
+
+            const straight = new Straight(0);
+            console.log(straight);
+
+            console.log(Straight.getFittingRotation([0, 1, 0, 1]));
+        </script>
     </body>
 </html>
