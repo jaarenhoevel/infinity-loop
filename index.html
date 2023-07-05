@@ -25,9 +25,9 @@
         <script type="module">
             import { InfinityLoop } from "./src/InfinityLoop/InfinityLoop.js";
 
-            const loop = new InfinityLoop(document.getElementById("grid-canvas"), 12, 10, 0.18, 0.25);
+            const loop = new InfinityLoop(document.getElementById("grid-canvas"), 12, 10, 0.2, 0.25);
 
-            loop.drawAllShapes();
+            loop.startAnimation();
 
             console.log(loop);
         </script>

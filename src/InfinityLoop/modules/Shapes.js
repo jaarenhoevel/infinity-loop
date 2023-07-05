@@ -52,11 +52,13 @@ class Shape {
     }
 
     static setLineMode(context, settings) {
+        context.strokeStyle = "black";
         context.lineWidth = settings.lineWidth;
         context.globalCompositeOperation = "source-over";
     }
 
     static setPaddingLineMode(context, settings) {
+        context.strokeStyle = "black";
         context.lineWidth = settings.paddingLineWidth;
         context.globalCompositeOperation = "destination-out";
     }
@@ -64,7 +66,7 @@ class Shape {
 
 class Empty extends Shape {
     static connections = [0, 0, 0, 0];
-    static weight = 0.25;
+    static weight = 0.6;
     
     constructor(rotation) {
         super(rotation);
@@ -80,7 +82,7 @@ class Empty extends Shape {
 
 class End extends Shape {
     static connections = [1, 0, 0, 0];
-    static weight = 0.25;
+    static weight = 0.4;
     
     constructor(rotation) {
         super(rotation);
@@ -105,7 +107,7 @@ class End extends Shape {
 
 class Curve extends Shape {
     static connections = [1, 1, 0, 0];
-    static weight = 0.4;
+    static weight = 0.5;
     
     constructor(rotation) {
         super(rotation);
@@ -129,7 +131,7 @@ class Curve extends Shape {
 
 class Straight extends Shape {
     static connections = [1, 0, 1, 0];
-    static weight = 0.4;
+    static weight = 0.6;
     
     constructor(rotation) {
         super(rotation);
@@ -148,13 +150,13 @@ class Straight extends Shape {
         context.moveTo(settings.shapeSize / 2, settings.shapeSize);
         context.lineTo(settings.shapeSize / 2, settings.shapeSize - (settings.shapeSize * this.animationProgress[2]));
 
-        context.stroke();    
+        context.stroke();
     }
 }
 
 class Branch extends Shape {
     static connections = [1, 1, 1, 0];
-    static weight = 0.4;
+    static weight = 0.5;
     
     constructor(rotation) {
         super(rotation);
@@ -184,7 +186,7 @@ class Branch extends Shape {
 
 class Cross extends Shape {
     static connections = [1, 1, 1, 1];
-    static weight = 0.4;
+    static weight = 0;
     
     constructor(rotation) {
         super(rotation);

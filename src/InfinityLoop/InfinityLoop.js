@@ -13,13 +13,15 @@ export class InfinityLoop {
 
         this.context = canvas.getContext("2d");
 
+        let shapeSize = canvas.width / x;
+
         this.drawSettings = {
-            lineWidth,
-            paddingLineWidth,
-            shapeSize: canvas.width / x
+            lineWidth: lineWidth * shapeSize,
+            paddingLineWidth: paddingLineWidth * shapeSize,
+            shapeSize
         }
 
-        console.log(`Shape size: ${this.drawSettings.shapeSize}px.`);
+        console.log("Shape settings:", this.drawSettings);
     }
 
     /**
@@ -68,7 +70,7 @@ export class InfinityLoop {
         for (let i = 0; i < this.grid.x; i ++) {
             for (let j = 0; j < this.grid.y; j ++) {
                 this.drawShape(this.grid.getShape(i, j), i, j);
-                console.log(`Drawing ${this.grid.getShape(i, j).constructor.name} at ${i} ${j}`);
+                // console.log(`Drawing ${this.grid.getShape(i, j).constructor.name} at ${i} ${j}`);
             }
         }
     }
@@ -79,12 +81,12 @@ export class InfinityLoop {
 
     startAnimation(stepTime = 20) {
         const paths = this.grid.getPaths();  
-        // console.log(paths);
+        console.log(paths);
 
         const animate = (pathElement) => {
             // console.log(`Current path element: [${pathElement.point[0]}][${pathElement.point[1]}]`);
 
-            this.grid.getShape(...pathElement.point).progress = [1, 1, 1, 1]; // set progress to finished
+            this.grid.getShape(...pathElement.point).animationProgress = [1, 1, 1, 1]; // set progress to finished
             this.drawAllShapes();
 
             pathElement.next.forEach(nextPathElement => {
