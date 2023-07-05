@@ -30,6 +30,12 @@
             console.log(straight.getConnections());
 
             console.log(Shapes.Straight.getFittingRotation([0, 1, 0, 1]));
+
+            const straight2 = new straight.constructor(0);
+
+            console.log(straight2);
+
+            console.log(Object.getPrototypeOf(straight2).constructor.getFittingRotation([0, 1, 0, 1]));
         </script>
     </body>
 </html>
