@@ -1,7 +1,7 @@
 import * as Shapes from "./Shapes.js";
 import { shuffle } from "./Helpers.js";
 
-class Grid {
+export class Grid {
     /**
      * 
      * @param {Number} x 
