@@ -81,7 +81,7 @@ export class InfinityLoop {
 
     startAnimation(stepTime = 20) {
         const paths = this.grid.getPaths();  
-        console.log(paths);
+        // console.log(paths);
 
         const animate = (pathElement) => {
             // console.log(`Current path element: [${pathElement.point[0]}][${pathElement.point[1]}]`);
