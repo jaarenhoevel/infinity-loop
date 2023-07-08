@@ -79,15 +79,38 @@ export class InfinityLoop {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    startAnimation(stepTime = 20) {
+    startAnimation(stepTime = 250) {
         const paths = this.grid.getPaths();  
         // console.log(paths);
 
-        const animate = (pathElement) => {
-            // console.log(`Current path element: [${pathElement.point[0]}][${pathElement.point[1]}]`);
+        const animateShape = (shape, inputDirection) => {
+            const startTime = Date.now();
+            const interval = setInterval(() => {
+                const progress = [0, 0, 0, 0];
+                let percentage = (Date.now() - startTime) / stepTime;
+                
+                if (percentage >= 1) {
+                    percentage = 1;
+                    clearInterval(interval);
+                }
+                
+                if (inputDirection !== -1) {
+                    progress[inputDirection] = percentage
+                } else {
+                    for (let i = 0; i < 4; i ++) {
+                        progress[i] = percentage
+                    }
+                }
+                
+                shape.setAnimationProgress(progress);
+                this.drawAllShapes(true);
+            }, 15);
+        }
 
-            this.grid.getShape(...pathElement.point).animationProgress = [1, 1, 1, 1]; // set progress to finished
-            this.drawAllShapes();
+        const animate = (pathElement) => {
+            console.log(`Current path element: [${pathElement.point[0]}][${pathElement.point[1]}]; Direction: ${pathElement.inputDirection}`);
+
+            animateShape(this.grid.getShape(...pathElement.point), pathElement.inputDirection);
 
             pathElement.next.forEach(nextPathElement => {
                 setTimeout(() => {
