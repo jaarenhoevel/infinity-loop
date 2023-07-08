@@ -223,8 +223,9 @@ export class Grid {
          * Describes path
          */
         class PathEntry {
-            constructor(point) {
+            constructor(point, inputDirection = -1) {
                 this.point = point;
+                this.inputDirection = inputDirection;
                 this.next = [];
             }
 
@@ -245,18 +246,18 @@ export class Grid {
 
             const nextCandidates = [];
 
-            if (connections[0] === 1) nextCandidates.push([point[0], point[1] - 1]);
-            if (connections[1] === 1) nextCandidates.push([point[0] + 1, point[1]]);
-            if (connections[2] === 1) nextCandidates.push([point[0], point[1] + 1]);
-            if (connections[3] === 1) nextCandidates.push([point[0] - 1, point[1]]);
+            if (connections[0] === 1) nextCandidates.push([[point[0], point[1] - 1], 0]);
+            if (connections[1] === 1) nextCandidates.push([[point[0] + 1, point[1]], 1]);
+            if (connections[2] === 1) nextCandidates.push([[point[0], point[1] + 1], 2]);
+            if (connections[3] === 1) nextCandidates.push([[point[0] - 1, point[1]], 3]);
 
             for (let index in nextCandidates) {
-                if (isTraversed(...nextCandidates[index])) continue;
+                if (isTraversed(...nextCandidates[index][0])) continue;
 
-                const path = new PathEntry(nextCandidates[index]);
+                const path = new PathEntry(...nextCandidates[index]);
                 pathEntry.addNext(path);
 
-                traverse(path, nextCandidates[index]);
+                traverse(path, nextCandidates[index][0]);
             }
 
         }
