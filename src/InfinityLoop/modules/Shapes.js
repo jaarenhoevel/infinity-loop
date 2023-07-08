@@ -82,7 +82,7 @@ class Empty extends Shape {
 
 class End extends Shape {
     static connections = [1, 0, 0, 0];
-    static weight = 0.4;
+    static weight = 0.6;
     
     constructor(rotation) {
         super(rotation);
@@ -107,7 +107,7 @@ class End extends Shape {
 
 class Curve extends Shape {
     static connections = [1, 1, 0, 0];
-    static weight = 0.6;
+    static weight = 0.4;
     
     constructor(rotation) {
         super(rotation);
