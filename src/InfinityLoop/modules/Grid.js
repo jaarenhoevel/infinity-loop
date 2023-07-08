@@ -246,10 +246,10 @@ export class Grid {
 
             const nextCandidates = [];
 
-            if (connections[0] === 1) nextCandidates.push([[point[0], point[1] - 1], 0]);
-            if (connections[1] === 1) nextCandidates.push([[point[0] + 1, point[1]], 1]);
-            if (connections[2] === 1) nextCandidates.push([[point[0], point[1] + 1], 2]);
-            if (connections[3] === 1) nextCandidates.push([[point[0] - 1, point[1]], 3]);
+            if (connections[0] === 1) nextCandidates.push([[point[0], point[1] - 1], 2]);
+            if (connections[1] === 1) nextCandidates.push([[point[0] + 1, point[1]], 3]);
+            if (connections[2] === 1) nextCandidates.push([[point[0], point[1] + 1], 0]);
+            if (connections[3] === 1) nextCandidates.push([[point[0] - 1, point[1]], 1]);
 
             for (let index in nextCandidates) {
                 if (isTraversed(...nextCandidates[index][0])) continue;
