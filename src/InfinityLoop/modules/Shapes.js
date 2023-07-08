@@ -33,6 +33,10 @@ class Shape {
         return -1;
     }
 
+    /**
+     * Get connections
+     * @returns {Array} connections
+     */
     getConnections() {
         const connections = [];
         for (let i = 0; i < 4; i ++) {
@@ -40,6 +44,16 @@ class Shape {
         }    
 
         return connections;
+    }
+
+    /**
+     * Set animation progress
+     * @param {Array} progress 
+     */
+    setAnimationProgress(progress) {
+        for (let i = 0; i < 4; i ++) {
+            this.animationProgress[i] = progress[(i + this.rotation) % 4];
+        }
     }
 
     /**
@@ -166,7 +180,7 @@ class Branch extends Shape {
     }
 
     draw(context, settings) {
-        if (Math.max(...this.animationProgress) === 0) return;
+        if (Math.max(...this.animationProgress) !== 1) return;
 
         Shape.setLineMode(context, settings);
         context.beginPath();
@@ -196,7 +210,7 @@ class Cross extends Shape {
     }
 
     draw(context, settings) {
-        if (Math.max(...this.animationProgress) === 0) return;
+        if (Math.max(...this.animationProgress) !== 1) return;
 
         // TOP RIGHT (FIRST HALF)
         Shape.setLineMode(context, settings);
