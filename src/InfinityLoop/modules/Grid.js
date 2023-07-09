@@ -242,7 +242,7 @@ export class Grid {
         const traverse = (pathEntry, point) => {
             traversed.push(point);
             
-            const connections = this.getShape(...point).getConnections();
+            const connections = this.getShape(...point).getTraversableConnections(pathEntry.inputDirection);
 
             const nextCandidates = [];
 

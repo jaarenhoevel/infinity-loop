@@ -38,12 +38,20 @@ class Shape {
      * @returns {Array} connections
      */
     getConnections() {
-        const connections = [];
+        return Shape.rotateConnections(this.connections, this.rotation);
+    }
+
+    static rotateConnections(connections, rotation) {
+        const output = [];
         for (let i = 0; i < 4; i ++) {
-            connections[(i + this.rotation) % 4] = this.connections[i];
+            output[(i + rotation) % 4] = connections[i];
         }    
 
-        return connections;
+        return output;    
+    }
+
+    getTraversableConnections(inputSide = 0) {
+        return this.getConnections();
     }
 
     /**
@@ -179,6 +187,24 @@ class Branch extends Shape {
         this.weight = Branch.weight;
     }
 
+    getTraversableConnections(inputSide = 0) {
+        let connections = [0, 0, 0, 0];
+
+        switch (inputSide) {
+            case 0:
+                connections = [0, 1, 0, 0];
+                break;
+            case 1:
+                connections = [1, 0, 1, 0];
+                break;
+            case 2:
+                connections = [0, 1, 0, 0];
+                break;
+        }
+
+        return Shape.rotateConnections(connections, this.rotation);
+    }
+
     draw(context, settings) {
         Shape.setLineMode(context, settings);
         context.beginPath();
@@ -217,6 +243,23 @@ class Cross extends Shape {
 
         this.connections = Cross.connections;
         this.weight = Cross.weight;
+    }
+
+    getTraversableConnections(inputSide = 0) {
+        let connections = [0, 0, 0, 0];
+
+        switch (inputSide) {
+            case 0:
+            case 2:
+                connections = [0, 1, 0, 1];
+                break;
+            case 1:
+            case 3:
+                connections = [1, 0, 1, 0];
+                break;
+        }
+
+        return Shape.rotateConnections(connections, this.rotation);
     }
 
     draw(context, settings) {
