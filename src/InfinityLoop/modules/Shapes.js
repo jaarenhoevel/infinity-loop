@@ -180,20 +180,30 @@ class Branch extends Shape {
     }
 
     draw(context, settings) {
-        if (Math.max(...this.animationProgress) !== 1) return;
+        Shape.setLineMode(context, settings);
+        context.beginPath();
+        context.arc(settings.shapeSize, 0, settings.shapeSize / 2, 0.5 * Math.PI, (0.5 * Math.PI) + (0.5 * Math.PI * this.animationProgress[1]));
+        context.stroke();
 
         Shape.setLineMode(context, settings);
         context.beginPath();
-        context.arc(settings.shapeSize, 0, settings.shapeSize / 2, 0.5 * Math.PI, Math.PI);
+        context.arc(settings.shapeSize, 0, settings.shapeSize / 2, Math.PI - (0.5 * Math.PI * this.animationProgress[0]), Math.PI);
         context.stroke();
 
+        
         Shape.setPaddingLineMode(context, settings);
         context.beginPath();
         context.arc(settings.shapeSize, settings.shapeSize, settings.shapeSize / 2, Math.PI, 1.5 * Math.PI);
         context.stroke();
+
         Shape.setLineMode(context, settings);
         context.beginPath();
-        context.arc(settings.shapeSize, settings.shapeSize, settings.shapeSize / 2, Math.PI, 1.5 * Math.PI);
+        context.arc(settings.shapeSize, settings.shapeSize, settings.shapeSize / 2, Math.PI, Math.PI + (0.5 * Math.PI * this.animationProgress[2]));
+        context.stroke();
+
+        Shape.setLineMode(context, settings);
+        context.beginPath();
+        context.arc(settings.shapeSize, settings.shapeSize, settings.shapeSize / 2, 1.5 * Math.PI - (0.5 * Math.PI * this.animationProgress[1]), 1.5 * Math.PI);
         context.stroke();  
     }
 }
